@@ -23,6 +23,10 @@ jobs:
       database_container_image: ${{ steps.deployment_data.outputs.database_container_image }}
       database_container_version: ${{ steps.deployment_data.outputs.database_container_version }}
 
+      cloud_provider: ${{ steps.deployment_data.outputs.cloud_provider }}
+      environment_short_name: ${{ steps.deployment_data.outputs.environment_name }}
+      environment_name: ${{ steps.deployment_data.outputs.environment }}
+
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v2
@@ -38,6 +42,20 @@ jobs:
             ;
             await deploymentPayload(context, core, github).extractDeploymentDetails();
 
+  # show_details:
+  #   runs-on: ubuntu-20.04
+
+  #   needs:
+  #     - deploy_details
+
+  #   steps:
+  #     - name: Expose Details
+  #       uses: actions/github-script@v3
+  #       env:
+  #         CLOUD_PROVIDER: ${{ needs.deploy_details.outputs.cloud_provider }}
+  #       with:
+  #         script: |
+  #           console.log(`CLOUD PROVIDER: ${process.env.CLOUD_PROVIDER}`);
 
   mirror_containers:
     name: Mirror Containers to Cloud Provider
@@ -48,7 +66,7 @@ jobs:
       - deploy_details
 
     environment:
-      name: ${{ needs.deploy_details.outputs.cloud_provider}}
+      name: ${{ needs.deploy_details.outputs.cloud_provider }}
 
     env:
       GHCR_APP_IMAGE: ${{ needs.deploy_details.outputs.container_registry }}/${{ needs.deploy_details.outputs.app_container_image }}:${{ needs.deploy_details.outputs.app_container_version }}
