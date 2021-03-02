@@ -75,7 +75,7 @@ jobs:
         uses: actions/github-script@v3
         env:
           cloud_provider: ${{ needs.deploy_details.outputs.cloud_provider }}
-          config: ${{ needs.deploy_details.outputs }}
+          config: ${{ toJSON(needs.deploy_details.outputs) }}
           gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -84,7 +84,7 @@ jobs:
             const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters/index.js`)
               , cloudUtils = require(scriptPath);
             ;
-            cloudUtils.create(context, core, github).exportParameters(process.env.config);
+            cloudUtils.create(context, core, github).exportParameters(JSON.parse(process.env.config));
 
       - name: Fetch Container Images from GHCR and Tag for Cloud provider
         run: |
