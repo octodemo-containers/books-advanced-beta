@@ -161,7 +161,7 @@ jobs:
 
 
   deploy:
-    name: Create Deployment
+    name: Create Deployment Request
     runs-on: ubuntu-20.04
 
     needs:
@@ -196,22 +196,23 @@ jobs:
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
-            const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js')
-              , createDeployment = require(scriptPath);
-            ;
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js');
+            const utils = require(scriptPath);
 
-            const payload = {
+            await utils.dispatch({
               context: context,
               github: github,
+              environmentName: 'prod',
+              cloudProvider: 'gcp',
               containerRegistry: process.env.container_registry,
               appContainerImage: process.env.app_container_image,
               appContainerVersion: process.env.app_container_version,
               databaseContainerImage: process.env.db_container_image,
               databaseContainerVersion: process.env.db_container_version,
               sha: process.env.sha,
-              head: context.ref,
-            }
+              head: context.ref
+            });
 
-            // Request deployments for Azure and GCP
-            createDeployment(Object.assign({environment: 'prod-azure'}, payload));
-            createDeployment(Object.assign({environment: 'prod-gcp'}, payload));
+  #           // Request deployments for Azure and GCP
+  #           createDeployment(Object.assign({environment: 'prod-azure'}, payload));
+  #           createDeployment(Object.assign({environment: 'prod-gcp'}, payload));
