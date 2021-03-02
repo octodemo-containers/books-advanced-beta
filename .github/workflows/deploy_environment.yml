@@ -87,12 +87,12 @@ jobs:
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
         run: |
           set ACR_URL="europe-west2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/octodemo-containers"
+          echo "ACR=europe-west2-docker.pkg.dev" >> $GITHUB_ENV
 
-          echo "APP_CONTAINER_IMAGE=$ACR_URL/${{ needs.deploy_details.outputs.app_container_image }}:${{ needs.deploy_details.outputs.app_container_version }}" >> $GITHUB_ENV
-          echo "DB_CONTAINER_IMAGE="$ACR_URL/${{ needs.deploy_details.outputs.database_container_image }}:${{ needs.deploy_details.outputs.database_container_version }}" >> $GITHUB_ENV
+          echo "APP_CONTAINER_IMAGE=europe-west2-docker.pkg.dev/${{ needs.deploy_details.outputs.app_container_image }}:${{ needs.deploy_details.outputs.app_container_version }}" >> $GITHUB_ENV
+          echo "DB_CONTAINER_IMAGE=europe-west2-docker.pkg.dev/${{ needs.deploy_details.outputs.database_container_image }}:${{ needs.deploy_details.outputs.database_container_version }}" >> $GITHUB_ENV
 
           echo "CONTAINER_REGISTRY=$ACR_URL" >> $GITHUB_ENV
-          echo "ACR=europe-west2-docker.pkg.dev" >> $GITHUB_ENV
         shell: bash
 
       - name: Generate Azure Container Tags
