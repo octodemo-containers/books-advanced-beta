@@ -1,10 +1,27 @@
 //
-// Creates a Deployment using the provided data
+// Creates a Deployment Request Repoisotry Dispatch Event using the provided data
 //
 
-module.exports = async(payload) => {
 
-  const environment = validateParameter(payload, 'environment'),
+module.exports.validateEnvironment = function(command) {
+  const commandRegex = /^deploy to (aws|azure|gcp) ([a-zA-Z-_]+)/i;
+
+  const matched = commandRegex.exect(command);
+  if (!matched) {
+    throw new Error(`The provided environment deployment command does not match the expected pattern 'deploy to <aws|azure|gcp> <name>'`);
+  }
+
+  return {
+    cloud: matched[1].toLowerCase(),
+    name: matched[2].toLowerCase()
+  };
+}
+
+
+module.exports.dispatch = async(payload) => {
+
+  const environmentName = validateParameter(payload, 'environmentName'),
+    cloudProvider = validateParameter(payload, 'cloudProvider'),
     context = validateParameter(payload, 'context'),
     github = validateParameter(payload, 'github'),
     containerRegistry = validateParameter(payload, 'containerRegistry'),
@@ -15,8 +32,11 @@ module.exports = async(payload) => {
     sha = validateParameter(payload, 'sha'),
     head = validateParameter(payload, 'head');
 
-  const isProduction = /^prod-.*/.test(environment),
-    deploymentEnvironment = isProduction ? environment : `${environment}-${head}-gcp`;
+  const isProduction = /^prod.*/.test(environmentName),
+    deploymentEnvironment = isProduction
+      ? `${environmentName}-${cloudProvider}`
+      : `${environmentName}-${head}-${cloudProvider}`
+      ;
 
   // A deployment payload for passing information of the components for the deployment
   const deploymentPayload = {
@@ -36,17 +56,10 @@ module.exports = async(payload) => {
 
   console.log(JSON.stringify(deploymentPayload, null, 2));
 
-  await github.repos.createDeployment({
+  await github.repos.createDispatchEvent({
     ...context.repo,
-    ref: head,
-    auto_merge: false,
-    required_contexts: [],
-    payload: JSON.stringify(deploymentPayload),
-    environment: deploymentEnvironment,
-    description: `Deploy to ${environment}`,
-    transient_environment: !isProduction,
-    production_environment: false, // Defaulting all environments to not be production types for now
-    mediaType: { previews: ["flash", "ant-man"] }
+    event_type: 'deployment_request',
+    client_payload: JSON.stringify(deploymentPayload)
   });
 }
 

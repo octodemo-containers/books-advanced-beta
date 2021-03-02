@@ -11,13 +11,10 @@ on:
       - labeled
 
 jobs:
-  deployment:
-    name: Create deployment
+  extract_deployment:
+    name: Extract Deployment Request
     runs-on: ubuntu-latest
-    if: |
-      github.event.label.name == 'Deploy to Test' ||
-      github.event.label.name == 'Deploy to Staging' ||
-      github.event.label.name == 'Deploy to QA'
+    if: startsWith(github.event.label.name, 'Deploy to ')
 
     steps:
       - name: Checkout Sources
@@ -58,25 +55,22 @@ jobs:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
             const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js');
-            const createDeployment = require(scriptPath);
+            const utils = require(scriptPath);
 
-            const LABEL_TO_ENVIRONMENT = {
-              'deploy to qa': 'qa',
-              'deploy to staging': 'staging',
-              'deploy to test': 'test'
-            };
+            const validEnvironment = utils.validateEnvironment(context.payload.label.name);
 
-            await createDeployment({
+            await utils.dispatch({
               context: context,
               github: github,
-              environment: LABEL_TO_ENVIRONMENT[context.payload.label.name.toLowerCase()],
+              environmentName: validateEnvironment.name,
+              cloudProvider: validateEnvironment.cloud,
               containerRegistry: process.env.container_registry,
               appContainerImage: process.env.app_container_image,
               appContainerVersion: process.env.app_container_version,
               databaseContainerImage: process.env.db_container_image,
               databaseContainerVersion: process.env.db_container_version,
               sha: context.sha,
-              head: context.payload.pull_request.head.ref, //Branch name PR created from
+              head: context.payload.pull_request.head.ref, // Branch name PR created from
             });
 
       - name: Report Failure

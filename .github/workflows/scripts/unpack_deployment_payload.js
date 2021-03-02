@@ -1,5 +1,5 @@
 class DeploymentPayload {
-    
+
     constructor(context, core, github) {
         this.context = context;
         this.core = core;
@@ -7,7 +7,7 @@ class DeploymentPayload {
     }
 
     // Unpacks the deployment payload and sets them as outputs then reports a deployment status
-    async unpackAndStart() {
+    async extractDeploymentDetails() {
         const context = this.context
             , github = this.github
             , core = this.core
@@ -15,36 +15,38 @@ class DeploymentPayload {
             , log_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${run}`
             ;
 
-        const deployment = context.payload.deployment
-            , environment = deployment.environment
-            , deploymentPayload = JSON.parse(deployment.payload)
-            ;
+        console.log(JSON.stringify(context.payload));
 
-        core.setOutput('app_container_image', deploymentPayload.app_container.image);
-        core.setOutput('app_container_version', deploymentPayload.app_container.version);
+    //     const deployment = context.payload.deployment
+    //         , environment = deployment.environment
+    //         , deploymentPayload = JSON.parse(deployment.payload)
+    //         ;
 
-        core.setOutput('database_container_image', deploymentPayload.database_container.image);
-        core.setOutput('database_container_version', deploymentPayload.database_container.version);
+    //     core.setOutput('app_container_image', deploymentPayload.app_container.image);
+    //     core.setOutput('app_container_version', deploymentPayload.app_container.version);
 
-        core.setOutput('deployment_sha', deploymentPayload.sha);
-        core.setOutput('deployment_github_ref', deploymentPayload.ref);
+    //     core.setOutput('database_container_image', deploymentPayload.database_container.image);
+    //     core.setOutput('database_container_version', deploymentPayload.database_container.version);
 
-        core.setOutput('environment', environment);
+    //     core.setOutput('deployment_sha', deploymentPayload.sha);
+    //     core.setOutput('deployment_github_ref', deploymentPayload.ref);
 
-        core.setOutput('container_registry', deploymentPayload.container_registry);
-        
-        
-        github.repos.createDeploymentStatus({
-            ...this.context.repo,
-            mediaType: {
-                previews: ["flash-preview", "ant-man"]
-            },
-            deployment_id: context.payload.deployment.id,
-            state: 'in_progress',
-            description: 'Deployment from GitHub Actions started',
-            target_url: log_url,
-            log_url: log_url
-        });
+    //     core.setOutput('environment', environment);
+
+    //     core.setOutput('container_registry', deploymentPayload.container_registry);
+
+
+    //     github.repos.createDeploymentStatus({
+    //         ...this.context.repo,
+    //         mediaType: {
+    //             previews: ["flash-preview", "ant-man"]
+    //         },
+    //         deployment_id: context.payload.deployment.id,
+    //         state: 'in_progress',
+    //         description: 'Deployment from GitHub Actions started',
+    //         target_url: log_url,
+    //         log_url: log_url
+    //     });
     }
 }
 
