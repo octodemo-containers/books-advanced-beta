@@ -10,11 +10,8 @@ class DeploymentPayload {
   async extractDeploymentDetails() {
     const context = this.context
       , core = this.core
+      , deploymentPayload = context.payload.client_payload
       ;
-
-    console.log(JSON.stringify(context.payload));
-
-    const deploymentPayload = context.payload.client_payload;
 
     core.setOutput('app_container_image', deploymentPayload.app_container.image);
     core.setOutput('app_container_version', deploymentPayload.app_container.version);

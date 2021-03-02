@@ -5,9 +5,6 @@ on:
     types:
       - deployment_request
 
-env:
-  GCP_SDK_VERSION: 312.0.0
-
 jobs:
   deploy_details:
     name: Define Deployment Details
@@ -27,6 +24,9 @@ jobs:
       environment_short_name: ${{ steps.deployment_data.outputs.environment_name }}
       environment_name: ${{ steps.deployment_data.outputs.environment }}
 
+      cloud_container_registry: ${{ steps.deployment_data.outputs.cloud_container_registry }}
+      cloud_container_registry_url: ${{ steps.deployment_data.outputs.cloud_container_registry_base_url }}
+
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v2
@@ -40,22 +40,9 @@ jobs:
             const scriptPath = require('path').resolve('./.github/workflows/scripts/unpack_deployment_payload.js')
               , deploymentPayload = require(scriptPath);
             ;
-            await deploymentPayload(context, core, github).extractDeploymentDetails();
+            const deploymentUtils = deploymentPayload(context, core, github)
+            deploymentUtils.extractDeploymentDetails();
 
-  # show_details:
-  #   runs-on: ubuntu-20.04
-
-  #   needs:
-  #     - deploy_details
-
-  #   steps:
-  #     - name: Expose Details
-  #       uses: actions/github-script@v3
-  #       env:
-  #         CLOUD_PROVIDER: ${{ needs.deploy_details.outputs.cloud_provider }}
-  #       with:
-  #         script: |
-  #           console.log(`CLOUD PROVIDER: ${process.env.CLOUD_PROVIDER}`);
 
   mirror_containers:
     name: Mirror Containers to Cloud Provider
@@ -73,7 +60,7 @@ jobs:
       GHCR_DB_IMAGE: ${{ needs.deploy_details.outputs.container_registry }}/${{ needs.deploy_details.outputs.database_container_image }}:${{ needs.deploy_details.outputs.database_container_version }}
 
     outputs:
-      container_registry: ${{ steps.push_containers.outputs.container_registry }}
+      container_registry: ${{ steps.push_containers.outputs.cloud_provider_parameters.container_registry_url }}
 
     steps:
       - name: Sign in to GitHub Container Registry
@@ -81,67 +68,58 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.OCTODEMOBOT_GHPR_TOKEN }}
-          registry: ghcr.io
+          registry: ${{ needs.deploy_details.outputs.container_registry }}
 
-      - name: Generate GCP Container Tags
-        if: needs.deploy_details.outputs.cloud_provider == 'gcp'
-        run: |
-          set ACR_URL="europe-west2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/octodemo-containers"
-          echo "ACR_URL=$ACR_URL" >> $GITHUB_ENV
-
-          echo "APP_CONTAINER_IMAGE=$ACR_URL/${{ needs.deploy_details.outputs.app_container_image }}:${{ needs.deploy_details.outputs.app_container_version }}" >> $GITHUB_ENV
-          echo "DB_CONTAINER_IMAGE=$ACR_URL/${{ needs.deploy_details.outputs.database_container_image }}:${{ needs.deploy_details.outputs.database_container_version }}" >> $GITHUB_ENV
-
-          echo "CONTAINER_REGISTRY=$ACR_URL" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Generate Azure Container Tags
-        if: needs.deploy_details.outputs.cloud_provider == 'azure'
-        run: |
-          set ACR_URL="octodemorg.azurecr.io"
-
-          echo "APP_CONTAINER_IMAGE=$ACR_URL/${{ needs.deploy_details.outputs.app_container_image }}:${{ needs.deploy_details.outputs.app_container_version }}" >> $GITHUB_ENV
-          echo "DB_CONTAINER_IMAGE="$ACR_URL/${{ needs.deploy_details.outputs.database_container_image }}:${{ needs.deploy_details.outputs.database_container_version }}" >> $GITHUB_ENV
-
-          echo "CONTAINER_REGISTRY=$ACR_URL" >> $GITHUB_ENV
-        shell: bash
+      - name: Generate Cloud Parameters
+        id: cloud_provider_parameters
+        uses: actions/github-script@v3
+        env:
+          cloud_provider: ${{ needs.deploy_details.outputs.cloud_provider }}
+          config: ${{ needs.deploy_details.outputs }}
+          gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters/${process.env.cloud_provider}.js`)
+            const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters/index.js`)
+              , cloudUtils = require(scriptPath);
+            ;
+            cloudUtils.create(context, core, github).exportParameters(process.env.config);
 
       - name: Fetch Container Images from GHCR and Tag for Cloud provider
         run: |
           docker pull $GHCR_APP_IMAGE
-          docker tag $GHCR_APP_IMAGE $APP_CONTAINER_IMAGE
+          docker tag $GHCR_APP_IMAGE ${{ steps.cloud_provider_parameters.outputs.app_container_image }}
 
           docker pull $GHCR_DB_IMAGE
-          docker tag $GHCR_DB_IMAGE $DB_CONTAINER_IMAGE
+          docker tag $GHCR_DB_IMAGE ${{ steps.cloud_provider_parameters.outputs.db_container_image }}
 
       - name: Sign in to Google Cloud Platform
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
         uses: google-github-actions/setup-gcloud@v0.2.0
         with:
-          version: ${{ env.GCP_SDK_VERSION }}
+          version: 312.0.0
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_TERRAFORM_SERVICE_ACCOUNT_KEY }}
+          service_account_key: ${{ secrets.GCP_ARTIFACT_REPOSITORY_ACCOUNT_KEY }}
           export_default_credentials: true
 
       - name: Configure Docker for GCR
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
         run: |
-          gcloud auth configure-docker $ACR
+          gcloud auth configure-docker ${{ steps.cloud_provider_parameters.outputs.container_registry }}
 
       - name: Login to Azure Container Registry
         if: needs.deploy_details.outputs.cloud_provider == 'azure'
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.ACR }}
+          registry: ${{ steps.cloud_provider_parameters.outputs.containerr_registry }}
           username: ${{ secrets.AZURE_CONTAINER_REGISTRY_CLIENT_ID }}
           password: ${{ secrets.AZURE_CONTAINER_REGISTRY_CLIENT_SECRET }}
 
       - name: Push GHCR containers to Cloud Provider
-        id: push_containers
         run: |
-          docker push $APP_CONTAINER_IMAGE
-          docker push $DB_CONTAINER_IMAGE
-          echo "::set-output name=container_registry::$CONTAINER_REGISTRY
+          docker push ${{ steps.cloud_provider_parameters.outputs.app_container_image }}
+          docker push ${{ steps.cloud_provider_parameters.outputs.db_container_image }}
 
   # deploy:
   #   name: Terraform Deploy
