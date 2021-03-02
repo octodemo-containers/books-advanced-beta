@@ -18,7 +18,7 @@ class CloudProviderParameters {
     });
 
     Object.keys(parameters.outputs).forEach(name => {
-      core.exportVariable(name, parameters.outputs[name]);
+      core.seteOutput(name, parameters.outputs[name]);
     });
   }
 
