@@ -54,12 +54,13 @@ module.exports.dispatch = async(payload) => {
     ref: context.ref,
   };
 
+  console.log('Deployment Request Payload:');
   console.log(JSON.stringify(deploymentPayload, null, 2));
 
   await github.repos.createDispatchEvent({
     ...context.repo,
     event_type: 'deployment_request',
-    client_payload: JSON.stringify(deploymentPayload)
+    client_payload: deploymentPayload
   });
 }
 
