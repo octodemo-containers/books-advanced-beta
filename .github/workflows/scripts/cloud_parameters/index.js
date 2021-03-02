@@ -63,6 +63,6 @@ class CloudProviderParameters {
   }
 }
 
-module.exports.create = (context, core, github) {
+module.exports.create = (context, core, github) => {
   return new CloudProviderParameters(context, core, github);
 }
