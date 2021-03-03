@@ -24,7 +24,6 @@ jobs:
       maven_sha1: ${{ steps.build_params.outputs.maven_sha1 }}
       github_branch_name: ${{ steps.build_params.outputs.github_ref_branch_name }}
       github_short_sha: ${{ steps.build_params.outputs.github_short_sha }}
-      github_repository_name: ${{ steps.build_params.oututs.github_repository_name }}
 
     steps:
       - name: Checkout
@@ -194,7 +193,6 @@ jobs:
           db_container_version: ${{ needs.build_database.outputs.container_version }}
 
           sha: ${{ needs.build_parameters.outputs.github_short_sha }}
-          repository_name: ${{ needs.build_parameters.outputs.github_repository_name }}
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
@@ -213,7 +211,6 @@ jobs:
               databaseContainerVersion: process.env.db_container_version,
               sha: process.env.sha,
               head: context.ref,
-              repository_name: process.env.repository_name,
             });
 
   #           // Request deployments for Azure and GCP

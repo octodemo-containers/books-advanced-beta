@@ -54,6 +54,8 @@ module.exports.dispatch = async(payload) => {
     ref: context.ref,
     cloud_provider: cloudProvider,
     environment_name: environmentName,
+    repository_name: context.repo.name,
+    repo: context.repo,
   };
 
   console.log('Deployment Request Payload:');
