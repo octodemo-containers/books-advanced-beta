@@ -213,7 +213,7 @@ jobs:
               databaseContainerVersion: process.env.db_container_version,
               sha: process.env.sha,
               head: context.ref,
-              repository_name: process.env.github_repository_name,
+              repository_name: process.env.repository_name,
             });
 
   #           // Request deployments for Azure and GCP
