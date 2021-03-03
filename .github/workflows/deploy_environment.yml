@@ -64,8 +64,8 @@ jobs:
       GHCR_DB_IMAGE: ${{ needs.deploy_details.outputs.container_registry }}/${{ needs.deploy_details.outputs.database_container_image }}:${{ needs.deploy_details.outputs.database_container_version }}
 
     outputs:
-      container_registry: ${{ steps.push_containers.outputs.cloud_provider_parameters.container_registry_url }}
-      kubernetes_system: ${{ steps.push_containers.outputs.cloud_provider_parameters.kubernetes_system }}
+      container_registry: ${{ steps.cloud_provider_parameters.outputs.container_registry_url }}
+      kubernetes_system: ${{ steps.cloud_provider_parameters.outputs.kubernetes_system }}
 
     steps:
       - name: Checkout Sources
