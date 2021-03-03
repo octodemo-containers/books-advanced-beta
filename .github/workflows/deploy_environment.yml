@@ -63,10 +63,6 @@ jobs:
       GHCR_APP_IMAGE: ${{ needs.deploy_details.outputs.container_registry }}/${{ needs.deploy_details.outputs.app_container_image }}:${{ needs.deploy_details.outputs.app_container_version }}
       GHCR_DB_IMAGE: ${{ needs.deploy_details.outputs.container_registry }}/${{ needs.deploy_details.outputs.database_container_image }}:${{ needs.deploy_details.outputs.database_container_version }}
 
-    outputs:
-      container_registry: ${{ steps.cloud_provider_parameters.outputs.container_registry_url }}
-      kubernetes_system: ${{ steps.cloud_provider_parameters.outputs.kubernetes_system }}
-
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v2
@@ -88,11 +84,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            // const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters/${process.env.cloud_provider}.js`)
-            const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters/index.js`)
+            const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters.js`)
               , cloudUtils = require(scriptPath);
             ;
-            cloudUtils.create(context, core, github).exportParameters(JSON.parse(process.env.config));
+            cloudUtils.create(context, core, github).exportCloudParameters(JSON.parse(process.env.config));
 
       - name: Fetch Container Images from GHCR and Tag for Cloud provider
         run: |
@@ -146,18 +141,18 @@ jobs:
 
     # Set common Terraform execution environment variables
     env:
-      TF_VAR_ENVIRONMENT: ${{ needs.deploy_details.outputs.environment_name }}
-      TF_VAR_namespace: ${{ needs.deploy_details.outputs.namespace }}
+      # TF_VAR_ENVIRONMENT: ${{ needs.deploy_details.outputs.environment_name }}
+      # TF_VAR_namespace: ${{ needs.deploy_details.outputs.namespace }}
 
-      TF_VAR_container_registry: ${{ needs.mirror_containers.outputs.container_registry }}
+      # TF_VAR_container_registry: ${{ needs.mirror_containers.outputs.container_registry }}
 
-      TF_VAR_app_container: ${{ needs.deploy_details.outputs.app_container_image }}
-      TF_VAR_app_container_version: ${{ needs.deploy_details.outputs.app_container_version }}
+      # TF_VAR_app_container: ${{ needs.deploy_details.outputs.app_container_image }}
+      # TF_VAR_app_container_version: ${{ needs.deploy_details.outputs.app_container_version }}
 
-      TF_VAR_database_container: ${{ needs.deploy_details.outputs.database_container_image }}
-      TF_VAR_database_container_version: ${{ needs.deploy_details.outputs.database_container_version }}
+      # TF_VAR_database_container: ${{ needs.deploy_details.outputs.database_container_image }}
+      # TF_VAR_database_container_version: ${{ needs.deploy_details.outputs.database_container_version }}
 
-      KUBE_SYSTEM: ${{ needs.mirror_containers.outputs.kubernetes_system }}
+      # KUBE_SYSTEM: ${{ needs.mirror_containers.outputs.kubernetes_system }}
 
       # Directory that contains Terraform HCL to run
       TERRAFORM_WORKING_DIRECTORY: ./terraform/kubernetes
@@ -190,6 +185,20 @@ jobs:
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
         run: |
           gcloud container clusters get-credentials "${{ secrets.GKE_CLUSTER_NAME }}" --zone "${{ secrets.GKE_CLUSTER_LOCATION }}"
+
+      - name: Generate and Inject Terraform Parameters
+        id: terraform_environment_variables
+        uses: actions/github-script@v3
+        env:
+          cloud_provider: ${{ needs.deploy_details.outputs.cloud_provider }}
+          config: ${{ toJSON(needs.deploy_details.outputs) }}
+          gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+        with:
+          script: |
+            const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters.js`)
+              , cloudUtils = require(scriptPath);
+            ;
+            cloudUtils.create(context, core, github).exportTerraformParameters(JSON.parse(process.env.config));
 
       - name: Terraform - init
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
