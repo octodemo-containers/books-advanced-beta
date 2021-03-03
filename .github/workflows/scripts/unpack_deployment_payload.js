@@ -27,6 +27,7 @@ class DeploymentPayload {
     core.setOutput('environment_name', deploymentPayload.environment_name);
 
     core.setOutput('container_registry', deploymentPayload.container_registry);
+    core.setOutput('namespace', deploymentPayload.repository_name);
   }
 }
 

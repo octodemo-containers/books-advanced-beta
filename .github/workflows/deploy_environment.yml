@@ -13,6 +13,7 @@ jobs:
 
     outputs:
       container_registry: ${{ steps.deployment_data.outputs.container_registry }}
+      namespace: ${{ steps.deployment_data.outputs.namespace }}
 
       app_container_image: ${{ steps.deployment_data.outputs.app_container_image }}
       app_container_version: ${{ steps.deployment_data.outputs.app_container_version }}
@@ -146,6 +147,8 @@ jobs:
     # Set common Terraform execution environment variables
     env:
       TF_VAR_ENVIRONMENT: ${{ needs.deploy_details.outputs.environment_name }}
+      TF_VAR_namespace: ${{ needs.deploy_details.outputs.namespace }}
+
       TF_VAR_container_registry: ${{ needs.mirror_containers.outputs.cloud_container_registry }}
 
       TF_VAR_app_container: ${{ needs.deploy_details.outputs.app_container_image }}
