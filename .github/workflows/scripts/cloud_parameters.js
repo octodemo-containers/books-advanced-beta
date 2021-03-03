@@ -15,10 +15,11 @@ class CloudProviderParameters {
       TF_VAR_ENVIRONMENT: config.environment_name,
       TF_VAR_namespace: config.namespace,
       TF_VAR_container_registry: parameters.container_registry_url,
-      TF_VAR_app_container: parameters.app_container_image_url,
+      TF_VAR_app_container: config.app_container_image,
       TF_VAR_app_container_version: config.app_container_version,
-      TF_VAR_database_container: parameters.db_container_image_url,
+      TF_VAR_database_container: config.database_container_image,
       TF_VAR_database_container_version: config.db_container_version,
+
       KUBE_SYSTEM: cloudProvider
     };
 
@@ -65,7 +66,7 @@ class CloudProviderParameters {
       app_container_image_url: appContainerImage,
       app_container_image_with_tag: appContainerImageWithTag,
       db_container_image_url: dbContainerImage,
-      db_container_image_with_tag: dbContainerImageWithTag
+      db_container_image_with_tag: dbContainerImageWithTag,
     }
   }
 
@@ -80,10 +81,14 @@ class CloudProviderParameters {
     return {
       container_registry: acr,
       container_registry_url: acr,
+
       app_container_image_url: appContainerImage,
       app_container_image_with_tag: appContainerImageWithTag,
+      app_container_image: config.app_container_image,
+
       db_container_image_url: dbContainerImage,
-      db_container_image_with_tag: dbContainerImageWithTag
+      db_container_image_with_tag: dbContainerImageWithTag,
+      db_container_image: config.database_container_image,
     }
   }
 
