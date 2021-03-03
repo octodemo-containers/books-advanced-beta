@@ -149,7 +149,7 @@ jobs:
       TF_VAR_ENVIRONMENT: ${{ needs.deploy_details.outputs.environment_name }}
       TF_VAR_namespace: ${{ needs.deploy_details.outputs.namespace }}
 
-      TF_VAR_container_registry: ${{ needs.mirror_containers.outputs.cloud_container_registry }}
+      TF_VAR_container_registry: ${{ needs.mirror_containers.outputs.container_registry }}
 
       TF_VAR_app_container: ${{ needs.deploy_details.outputs.app_container_image }}
       TF_VAR_app_container_version: ${{ needs.deploy_details.outputs.app_container_version }}
