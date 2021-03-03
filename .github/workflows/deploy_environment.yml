@@ -99,7 +99,7 @@ jobs:
 
       - name: Sign in to Google Cloud Platform
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
-        uses: google-github-actions/setup-gcloud@v0.2.0
+        uses: google-github-actions/setup-gcloud@v0.2.1
         with:
           version: 312.0.0
           project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -115,7 +115,7 @@ jobs:
         if: needs.deploy_details.outputs.cloud_provider == 'azure'
         uses: docker/login-action@v1
         with:
-          registry: ${{ steps.cloud_provider_parameters.outputs.containerr_registry }}
+          registry: ${{ steps.cloud_provider_parameters.outputs.container_registry }}
           username: ${{ secrets.AZURE_CONTAINER_REGISTRY_CLIENT_ID }}
           password: ${{ secrets.AZURE_CONTAINER_REGISTRY_CLIENT_SECRET }}
 
@@ -170,11 +170,11 @@ jobs:
       - name: Setup Terragrunt
         uses: peter-murray/terragrunt-github-action@v1.0.0
         with:
-          terragrunt_version: 0.26.2
+          terragrunt_version: 0.28.7
 
       - name: Sign in to Google Cloud Platform
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
-        uses: google-github-actions/setup-gcloud@v0.2.0
+        uses: google-github-actions/setup-gcloud@v0.2.1
         with:
           version: 312.0.0
           project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -183,8 +183,14 @@ jobs:
 
       - name: Authenticate with Kubernetes Cluster
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
-        run: |
-          gcloud container clusters get-credentials "${{ secrets.GKE_CLUSTER_NAME }}" --zone "${{ secrets.GKE_CLUSTER_LOCATION }}"
+        uses: google-github-actions/get-gke-credentials@v0.2.1
+        with:
+          cluster-name: ${{ secrets.GKE_CLUSTER_NAME }}
+          location: ${{ secrets.GKE_CLUSTER_LOCATION }}
+          credentials: ${{ secrets.GCP_TERRAFORM_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+        # run: |
+        #   gcloud container clusters get-credentials "${{ secrets.GKE_CLUSTER_NAME }}" --zone "${{ secrets.GKE_CLUSTER_LOCATION }}"
 
       - name: Generate and Inject Terraform Parameters
         id: terraform_environment_variables

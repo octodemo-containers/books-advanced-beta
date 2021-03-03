@@ -19,8 +19,6 @@ class CloudProviderParameters {
       TF_VAR_app_container_version: config.app_container_version,
       TF_VAR_database_container: config.database_container_image,
       TF_VAR_database_container_version: config.db_container_version,
-
-      KUBE_SYSTEM: cloudProvider
     };
 
     this._exportParameters(envVars, {});
