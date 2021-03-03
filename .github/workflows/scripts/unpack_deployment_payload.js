@@ -19,9 +19,8 @@ class DeploymentPayload {
     core.setOutput('database_container_image', deploymentPayload.database_container.image);
     core.setOutput('database_container_version', deploymentPayload.database_container.version);
 
-    //TODO these are currently unused but present in the payload
-    // core.setOutput('deployment_sha', deploymentPayload.sha);
-    // core.setOutput('deployment_github_ref', deploymentPayload.ref);
+    core.setOutput('deployment_sha', deploymentPayload.sha);
+    core.setOutput('deployment_github_ref', deploymentPayload.ref);
 
     core.setOutput('environment', deploymentPayload.environment);
     core.setOutput('cloud_provider', deploymentPayload.cloud_provider);

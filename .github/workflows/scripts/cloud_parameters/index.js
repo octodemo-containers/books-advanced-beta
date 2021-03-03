@@ -42,6 +42,8 @@ class CloudProviderParameters {
       outputs['db_container_image'] = dbContainerImage;
       outputs['container_registry'] = acr;
       outputs['container_registry_url'] = acrUrl;
+      outputs['kubernetes_system'] = cloudProvider;
+
     } else if (cloudProvider === 'azure') {
       const acr = `octodemorg.azurecr.io`
         , appContainerImage = `${acr}/${config.app_container_image}:${config.app_container_version}`
@@ -52,6 +54,8 @@ class CloudProviderParameters {
       outputs['db_container_image'] = dbContainerImage;
       outputs['container_registry'] = acr;
       outputs['container_registry_url'] = acr;
+      outputs['kubernetes_system'] = cloudProvider;
+
     } else {
       throw new Error(`Unsupported cloud platform: ${cloudProvider}`);
     }
