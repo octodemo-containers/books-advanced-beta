@@ -8,6 +8,6 @@ remote_state {
 
     config = {
         bucket      = "octodemo-containers-bookstore"
-        prefix      = "${get_env("TF_VAR_namespace", "default")-${get_env("TF_VAR_ENVIRONMENT", "integration")}.terraform.state"
+        prefix      = "${get_env("TF_VAR_namespace", "default")}-${get_env("TF_VAR_ENVIRONMENT", "integration")}.terraform.state"
     }
 }
