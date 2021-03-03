@@ -69,7 +69,7 @@ class CloudProviderParameters {
   }
 
   _getAzureParameters(config) {
-    const acr = `octodemorg.azurecr.io`
+    const acr = `octodemocontainers.azurecr.io`
       , appContainerImageWithTag = `${config.app_container_image}:${config.app_container_version}`
       , appContainerImage = `${acr}/${appContainerImageWithTag}`
       , dbContainerImageWithTag = `${config.database_container_image}:${config.database_container_version}`
