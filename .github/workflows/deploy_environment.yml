@@ -145,8 +145,8 @@ jobs:
 
     # Set common Terraform execution environment variables
     env:
-      TF_VAR_ENVIRONMENT: ${{ github.event.deployment.environment }}
-      TF_VAR_container_registry: ${{ needs.deploy_details.outputs.container_registry_url }}
+      TF_VAR_ENVIRONMENT: ${{ needs.deploy_details.outputs.environment_name }}
+      TF_VAR_container_registry: ${{ needs.mirror_containers.outputs.cloud_container_registry }}
 
       TF_VAR_app_container: ${{ needs.deploy_details.outputs.app_container_image }}
       TF_VAR_app_container_version: ${{ needs.deploy_details.outputs.app_container_version }}
@@ -154,7 +154,7 @@ jobs:
       TF_VAR_database_container: ${{ needs.deploy_details.outputs.database_container_image }}
       TF_VAR_database_container_version: ${{ needs.deploy_details.outputs.database_container_version }}
 
-      KUBE_SYSTEM: ${{ needs.deploy_details.outputs.kubernetes_system }}
+      KUBE_SYSTEM: ${{ needs.mirror_containers.outputs.kubernetes_system }}
 
       # Directory that contains Terraform HCL to run
       TERRAFORM_WORKING_DIRECTORY: ./terraform/kubernetes
