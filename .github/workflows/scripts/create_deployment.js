@@ -54,7 +54,7 @@ module.exports.dispatch = async(payload) => {
     ref: context.ref,
     cloud_provider: cloudProvider,
     environment_name: environmentName,
-    repository_name: context.repo.name,
+    repository_name: context.repo.repo,
     repo: context.repo,
   };
 
