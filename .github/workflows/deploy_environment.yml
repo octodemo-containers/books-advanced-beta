@@ -138,7 +138,7 @@ jobs:
 
     environment:
       name: ${{ needs.deploy_details.outputs.environment_name }}
-      url: ${{ steps.terraform_output.outputs }}
+      url: ${{ steps.clean_environment_url.outputs.url }}
 
     env:
       # Directory that contains Terraform HCL to run
@@ -212,28 +212,21 @@ jobs:
         working-directory: ${{ env.TERRAFORM_WORKING_DIRECTORY }}
         run: terraform output -json website_url
 
-      # - name: Report Success
-      #   uses: actions/github-script@v3
-      #   env:
-      #     environment_url: ${{ steps.terraform_output.outputs.stdout }}
-      #   with:
-      #     script: |
-      #       const scriptPath = require('path').resolve('./.github/workflows/scripts/deploymentManager.js')
-      #         , DeploymentManager = require(scriptPath)
-      #         ;
+      - name: Extract environment URL
+        id: clean_environment_url
+        uses: actions/github-script@v3
+        env:
+          terraform_url: ${{ steps.terraform_output.outputs.stdout }}
+        with:
+          script: |
+            // Terraform has started putting out quoted strings now, so we have to clean them up
 
-      #       const manager = new DeploymentManager(context, github);
-      #       await manager.activateDeployment(context.payload.deployment.id, process.env.environment_url);
+            const data = process.env.terraform_url;
+            let result = data.trim();
 
-      # - name: Report Failure
-      #   if: failure()
-      #   uses: octokit/request-action@v1.x
-      #   with:
-      #     route: POST /repos/:owner/:repo/deployments/:deployment_id/statuses
-      #     deployment_id: ${{ github.event.deployment.id }}
-      #     description: "Deploy failed for ${{ github.event.deployment.environment }}"
-      #     environment: ${{ github.event.deployment.environment }}
-      #     state: "failure"
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            const regex = /^"(.*)"$/;
+            if (regex.test(result)) {
+              result = regex.exec(result)[1]
+            }
 
+            core.setOutput('url', result);
