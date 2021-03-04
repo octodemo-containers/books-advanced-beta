@@ -121,9 +121,20 @@ jobs:
           password: ${{ secrets.AZURE_CONTAINER_REGISTRY_CLIENT_SECRET }}
 
       - name: Push GHCR containers to Cloud Provider
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enable
         run: |
-          docker push ${{ steps.cloud_provider_parameters.outputs.app_container_image }}
-          docker push ${{ steps.cloud_provider_parameters.outputs.database_container_image }}
+          if docker manifest inspect ${{ steps.cloud_provider_parameters.outputs.app_container_image }} > /dev/null ; then
+            echo "${{ steps.cloud_provider_parameters.outputs.app_container_image }} already present in registry"
+          else
+            docker push ${{ steps.cloud_provider_parameters.outputs.app_container_image }}
+          fi
+
+          if docker manifest inspect ${{ steps.cloud_provider_parameters.outputs.database_container_image }} > /dev/null ; then
+            echo "${{ steps.cloud_provider_parameters.outputs.database_container_image }} already present in registry"
+          else
+            docker push ${{ steps.cloud_provider_parameters.outputs.database_container_image }}
+          fi
 
 
   deploy_to_cloud:
