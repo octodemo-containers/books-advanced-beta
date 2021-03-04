@@ -58,6 +58,7 @@ jobs:
 
     environment:
       name: ${{ needs.deploy_details.outputs.cloud_provider }}
+      url: ${{ steps.cloud_provider_parameters.outputs.container_registry }}
 
     env:
       GHCR_APP_IMAGE: ${{ needs.deploy_details.outputs.container_registry }}/${{ needs.deploy_details.outputs.app_container_image }}:${{ needs.deploy_details.outputs.app_container_version }}

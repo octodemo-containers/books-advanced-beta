@@ -13,21 +13,31 @@ class DeploymentPayload {
       , deploymentPayload = context.payload.client_payload
       ;
 
-    core.setOutput('app_container_image', deploymentPayload.app_container.image);
-    core.setOutput('app_container_version', deploymentPayload.app_container.version);
+    const deployment = {
+      app_container_image: deploymentPayload.app_container.image,
+      app_container_version: deploymentPayload.app_container.version,
 
-    core.setOutput('database_container_image', deploymentPayload.database_container.image);
-    core.setOutput('database_container_version', deploymentPayload.database_container.version);
+      database_container_image: deploymentPayload.database_container.image,
+      database_container_version: deploymentPayload.database_container.version,
 
-    core.setOutput('deployment_sha', deploymentPayload.sha);
-    core.setOutput('deployment_github_ref', deploymentPayload.ref);
+      deployment_sha: deploymentPayload.sha,
+      deployment_github_ref: deploymentPayload.ref,
 
-    core.setOutput('environment', deploymentPayload.environment);
-    core.setOutput('cloud_provider', deploymentPayload.cloud_provider);
-    core.setOutput('environment_name', deploymentPayload.environment_name);
+      environment: deploymentPayload.environment,
+      environment_name: deploymentPayload.environment_name,
 
-    core.setOutput('container_registry', deploymentPayload.container_registry);
-    core.setOutput('namespace', `${deploymentPayload.repository_name.toLowerCase().replace(/_/g, '-')}`);
+      cloud_provider: deploymentPayload.cloud_provider,
+
+      container_registry: deploymentPayload.container_registry,
+      namespace: `${deploymentPayload.repository_name.toLowerCase().replace(/_/g, '-')}`,
+    };
+
+    console.log('Deployment Request Payload:');
+    console.log(JSON.stringify(deployment, null, 2));
+
+    Object.keys(deployment).forEach(key => {
+      core.setOutput(key, deployment[key]);
+    });
   }
 }
 
