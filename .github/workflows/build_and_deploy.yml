@@ -209,7 +209,7 @@ jobs:
               databaseContainerImage: process.env.db_container_image,
               databaseContainerVersion: process.env.db_container_version,
               short_sha: process.env.sha,
-              sha: context.sha
+              sha: context.sha,
               head: context.ref,
             }
 
