@@ -199,11 +199,10 @@ jobs:
             const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js');
             const utils = require(scriptPath);
 
-            await utils.dispatch({
+            const payloadData = {
               context: context,
               github: github,
               environmentName: 'prod',
-              cloudProvider: 'gcp',
               containerRegistry: process.env.container_registry,
               appContainerImage: process.env.app_container_image,
               appContainerVersion: process.env.app_container_version,
@@ -211,8 +210,8 @@ jobs:
               databaseContainerVersion: process.env.db_container_version,
               sha: process.env.sha,
               head: context.ref,
-            });
+            }
 
-  #           // Request deployments for Azure and GCP
-  #           createDeployment(Object.assign({environment: 'prod-azure'}, payload));
-  #           createDeployment(Object.assign({environment: 'prod-gcp'}, payload));
+            // Request production deployments for GCP and Azure
+            await utils.dispatch(Object.assign({cloudProvider: 'gcp'}, payloadData));
+            await utils.dispatch(Object.assign({cloudProvider: 'azure'}, payloadData));
