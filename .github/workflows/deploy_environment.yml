@@ -81,6 +81,7 @@ jobs:
           cloud_provider: ${{ needs.deploy_details.outputs.cloud_provider }}
           config: ${{ toJSON(needs.deploy_details.outputs) }}
           gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -122,7 +123,6 @@ jobs:
       - name: Push GHCR containers to Cloud Provider
         run: |
           docker push ${{ steps.cloud_provider_parameters.outputs.app_container_image }}
-          docker push ${{ steps.cloud_provider_parameters.outputs.database_container_image }}
           docker push ${{ steps.cloud_provider_parameters.outputs.database_container_image }}
 
 
