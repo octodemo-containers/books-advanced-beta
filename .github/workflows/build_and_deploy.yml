@@ -192,7 +192,7 @@ jobs:
           db_container_image: ${{ needs.build_database.outputs.container_image }}
           db_container_version: ${{ needs.build_database.outputs.container_version }}
 
-          sha: ${{ needs.build_parameters.outputs.github_short_sha }}
+          short_sha: ${{ needs.build_parameters.outputs.github_short_sha }}
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
@@ -208,7 +208,8 @@ jobs:
               appContainerVersion: process.env.app_container_version,
               databaseContainerImage: process.env.db_container_image,
               databaseContainerVersion: process.env.db_container_version,
-              sha: process.env.sha,
+              short_sha: process.env.sha,
+              sha: context.sha
               head: context.ref,
             }
 

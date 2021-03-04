@@ -29,6 +29,7 @@ module.exports.dispatch = async(payload) => {
     appContainerVersion = validateParameter(payload, 'appContainerVersion'),
     databaseContainerImage = validateParameter(payload, 'databaseContainerImage'),
     databaseContainerVersion = validateParameter(payload, 'databaseContainerVersion'),
+    shortSha = validateParameter(payload, 'short_sha'),
     sha = validateParameter(payload, 'sha'),
     head = validateParameter(payload, 'head');
 
@@ -50,6 +51,7 @@ module.exports.dispatch = async(payload) => {
       version: databaseContainerVersion,
     },
     sha: sha,
+    short_sha: shortSha,
     environment: deploymentEnvironment,
     ref: context.ref,
     cloud_provider: cloudProvider,
