@@ -19,7 +19,6 @@ module.exports.validateEnvironment = function(command) {
 
 
 module.exports.dispatch = async(payload) => {
-
   const environmentName = validateParameter(payload, 'environmentName'),
     cloudProvider = validateParameter(payload, 'cloudProvider'),
     context = validateParameter(payload, 'context'),
@@ -69,6 +68,7 @@ module.exports.dispatch = async(payload) => {
     client_payload: deploymentPayload
   });
 }
+
 
 function validateParameter(payload, name) {
   const value = payload[name];

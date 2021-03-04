@@ -61,8 +61,8 @@ jobs:
             const payloadData = {
               context: context,
               github: github,
-              environmentName: validateEnvironment.name,
-              cloudProvider: validateEnvironment.cloud,
+              environmentName: validEnvironment.name,
+              cloudProvider: validEnvironment.cloud,
               containerRegistry: process.env.container_registry,
               appContainerImage: process.env.app_container_image,
               appContainerVersion: process.env.app_container_version,
