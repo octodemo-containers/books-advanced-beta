@@ -35,7 +35,8 @@ module.exports.dispatch = async(payload) => {
   const isProduction = /^prod.*/.test(environmentName),
     deploymentEnvironment = isProduction
       ? `${environmentName}-${cloudProvider}`
-      : `${environmentName}-${head}-${cloudProvider}`
+      : `${environmentName}-${cloudProvider}`
+      // : `${environmentName}-${head}-${cloudProvider}`
       ;
 
   // A deployment payload for passing information of the components for the deployment
