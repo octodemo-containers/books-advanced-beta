@@ -8,7 +8,7 @@ jobs:
   build:
     name: Perform CodeQL Scanning
     runs-on: ubuntu-20.04
-    
+
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
@@ -37,10 +37,6 @@ jobs:
         with:
           languages: java
 
-      # Disabling Autobuild so we can gain more control over the Maven build process, simple projects can use this step
-      # - name: Autobuild
-      #   uses: github/codeql-action/autobuild@v1
-      #
       # We are using a custom build step to have greater control over the build process and to disable the container
       # building profile in the Maven POM that auto activates (as the container is not useful to this workflow)
       - name: Custom Build Step
@@ -51,4 +47,3 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
-    
