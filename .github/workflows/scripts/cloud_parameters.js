@@ -122,13 +122,23 @@ class CloudProviderParameters {
   _exportParameters(envVars, outputs) {
     const core = this.core;
 
-    Object.keys(envVars).forEach(name => {
-      core.exportVariable(name, envVars[name]);
-    });
+    if (envVars) {
+      console.log('Exporting Environment Variables:');
+      console.log(JSON.stringify(envVars, null, 2));
 
-    Object.keys(outputs).forEach(name => {
-      core.setOutput(name, outputs[name]);
-    });
+      Object.keys(envVars).forEach(name => {
+        core.exportVariable(name, envVars[name]);
+      });
+    }
+
+    if (outputs) {
+      console.log('Setting Step Outputs:')
+      console.log(JSON.stringify(outputs, null, 2));
+
+      Object.keys(outputs).forEach(name => {
+        core.setOutput(name, outputs[name]);
+      });
+    }
   }
 }
 
