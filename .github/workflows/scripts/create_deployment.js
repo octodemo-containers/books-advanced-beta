@@ -28,7 +28,7 @@ module.exports.dispatch = async(payload) => {
     appContainerVersion = validateParameter(payload, 'appContainerVersion'),
     databaseContainerImage = validateParameter(payload, 'databaseContainerImage'),
     databaseContainerVersion = validateParameter(payload, 'databaseContainerVersion'),
-    shortSha = validateParameter(payload, 'short_sha'),
+    shortSha = payload['short_sha'],
     sha = validateParameter(payload, 'sha'),
     head = validateParameter(payload, 'head');
 
