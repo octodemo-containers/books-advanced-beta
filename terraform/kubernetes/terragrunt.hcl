@@ -6,7 +6,7 @@ remote_state {
         if_exists   = "overwrite_terragrunt"
     }
 
-    # Generate the backend parameters as per the cloud provider, defaultingto GCP as a fallback
+    # Generate the backend parameters as per the cloud provider, defaulting to gcs as a fallback
     config = jsondecode(
         templatefile("backend_config/${get_env("TF_VAR_state_backend", "gcs")}.tpl",
             {

@@ -21,6 +21,22 @@ class CloudProviderParameters {
       TF_VAR_database_container_version: config.database_container_version,
     };
 
+    if (parameters.terraform_backend) {
+      const backend = parameters.terraform_backend;
+
+      if(backend.state) {
+        Object.keys(backend.state).forEach(key => {
+          envVars[`TF_VAR_${key}`] = backend.state[key];
+        });
+      }
+
+      if (backend.vars) {
+        Object.keys(backend.vars).forEach(key => {
+          envVars[key] = backend.vars[key];
+        });
+      }
+    }
+
     this._exportParameters(envVars, {});
   }
 
@@ -65,6 +81,12 @@ class CloudProviderParameters {
       app_container_image_with_tag: appContainerImageWithTag,
       database_container_image_url: dbContainerImage,
       database_container_image_with_tag: dbContainerImageWithTag,
+
+      terraform_backend: {
+        state: {
+          state_backend: 'gcs',
+        },
+      }
     }
   }
 
@@ -83,6 +105,17 @@ class CloudProviderParameters {
       app_container_image_with_tag: appContainerImageWithTag,
       database_container_image_url: dbContainerImage,
       database_container_image_with_tag: dbContainerImageWithTag,
+
+      terraform_backend: {
+        state: {
+          state_backend: 'azurerm',
+          azure_storage_account_resource_group: process.env.azure_storage_account_resource_group,
+          azure_storage_account_name: process.env.azure_storage_account_name,
+        },
+        vars: {
+          ARM_ACCESS_KEY: process.env.arm_access_key
+        }
+      },
     }
   }
 

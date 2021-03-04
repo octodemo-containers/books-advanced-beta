@@ -168,7 +168,7 @@ jobs:
           service_account_key: ${{ secrets.GCP_TERRAFORM_SERVICE_ACCOUNT_KEY }}
           export_default_credentials: true
 
-      - name: Authenticate with Kubernetes Cluster
+      - name: Authenticate with Kubernetes Cluster for GKE
         if: needs.deploy_details.outputs.cloud_provider == 'gcp'
         uses: google-github-actions/get-gke-credentials@v0.2.1
         with:
@@ -177,13 +177,26 @@ jobs:
           credentials: ${{ secrets.GCP_TERRAFORM_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+      - name: Configure kubectl for Azure Kubernetes Services
+        if: needs.deploy_details.outputs.cloud_provider == 'azure'
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AKS_SVC_PRINCIPAL}}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
+
       - name: Generate and Inject Terraform Parameters
         id: terraform_environment_variables
         uses: actions/github-script@v3
         env:
           cloud_provider: ${{ needs.deploy_details.outputs.cloud_provider }}
           config: ${{ toJSON(needs.deploy_details.outputs) }}
+
+          # All of the relevant cloud specific parameters required to connect, only one set will get used in practice
           gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
+          azure_storage_account_resource_group: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          azure_storage_account_name: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          arm_access_key: ${{ secrets.ARM_ACCESS_KEY }}
         with:
           script: |
             const scriptPath = require('path').resolve(`./.github/workflows/scripts/cloud_parameters.js`)
