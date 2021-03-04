@@ -16,3 +16,4 @@ kubectl create -f $DIR/database-service.yml
 kubectl create -f $DIR/bookstore-configmap.yml
 kubectl create -f $DIR/bookstore-deployment.yml
 kubectl create -f $DIR/bookstore-service.yml
+
