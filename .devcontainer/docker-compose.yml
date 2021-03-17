@@ -3,8 +3,7 @@ version: '3.8'
 
 services:
   app:
-    #image: maven:3.6.3-jdk-11
-    image: ghcr.io/octodemo/container-java-development:gcp
+    image: ghcr.io/octodemo/container-java-development:azure
     command: sleep infinity
     network_mode: host
 
