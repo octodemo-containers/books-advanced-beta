@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Get temporary token
         id: temp_token
         uses: peter-murray/workflow-application-token-action@v1
@@ -61,7 +61,7 @@ jobs:
                   labels: [`deploy to ${parts.cloud} ${parts.name}`]
                 });
               } else {
-                core.error(`Unsupported environment for deploy slash command; ${parts.name}`);
+                core.setFailure(`Unsupported environment for deploy slash command; ${parts.name}`);
 
                 await github.issues.createComment({
                   ...context.repo,
@@ -70,6 +70,12 @@ jobs:
                 });
               }
             } catch (err) {
-              core.error(`Error processing request; ${request}`);
               core.error(err);
+
+              core.setFailure(`Error processing request; ${request}`);
+              await github.issues.createComment({
+                  ...context.repo,
+                  issue_number: context.issue.number,
+                  body: `:red_circle: Problem with __deploy__ slash command; ${err.message}`
+                });
             }
