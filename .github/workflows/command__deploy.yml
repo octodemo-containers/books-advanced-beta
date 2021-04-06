@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     # Save some actions minutes, and only execute when necessary :-)
-    if: startsWith(github.event.comment.body, '/deploy ')
+    if: startsWith(github.event.comment.body, '/deploy to ')
 
     steps:
       - name: Get temporary token
@@ -32,18 +32,34 @@ jobs:
         with:
           github-token: ${{ steps.temp_token.outputs.token }}
           script: |
-            const comment = context.payload.comment.body;
-            const request = /\/deploy (.*)/.exec(comment);
-            const ALLOWED_ENVIRONMENTS = ['qa', 'test'];
-            // Ensure request is one of the allowed options
-            if (request && ALLOWED_ENVIRONMENTS.indexOf(request[1]) > -1) {
-              console.log(`deploy request for environment "${request[1]}"`);
+            const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js');
+            const utils = require(scriptPath);
 
-              await github.issues.addLabels({
-                ...context.repo,
-                issue_number: context.issue.number,
-                labels: [`Deploy to ${request[1]}`]
-              });
-            } else {
-              console.log(`:red_circle:  Unsupported deployment request to environment "${request ? request[1] : null}"`);
+            const request = context.payload.comment.body;
+            const ALLOWED_ENVIRONMENTS = ['qa', 'test'];
+
+            try {
+              const parts = utils.validateEnvironment(request);
+
+              // Ensure request is one of the allowed options
+              if (parts && ALLOWED_ENVIRONMENTS.indexOf(parts.name]) > -1) {
+                core.info(`deploy request for environment "${parts.name} in ${parts.cloud}"`);
+
+                await github.issues.addLabels({
+                  ...context.repo,
+                  issue_number: context.issue.number,
+                  labels: [`deploy to ${parts.cloud} ${parts.name}`]
+                });
+              } else {
+                core.error(`Unsupported environment for deploy slash command; ${parts.name}`);
+
+                await github.issues.createComment({
+                  ...context.repo,
+                  issue_number: context.issue.number,
+                  body: `:red_circle: Unsupported environment for deploy slash command; ${parts.name}, can only use this command with environments _${ALLOWED_ENVIRONMENTS.join(', ')}_.`
+                });
+              }
+            } catch (err) {
+              core.error(`Error processing request; ${request}`);
+              core.error(err);
             }
