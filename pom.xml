@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.octodemo-containers</groupId>
-    <artifactId>bookstore-advanced</artifactId>
+    <artifactId>bookstore-advanced-beta</artifactId>
     <version>${revision}${changelist}${sha1}</version>
     <packaging>war</packaging>
 
     <name>${project.artifactId}</name>
     <description>A Java example project to demonstrate a Java development stack with Maven, GitHub Actions, GitHub Package Registry and Cloud Resources.</description>
-    <url>https://github.com/octodemo-containers/bookstore-advanced</url>
+    <url>https://github.com/octodemo-containers/bookstore-advanced-beta</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,7 +40,7 @@
             Properties for naming, tagging and deploying the Docker image, when running under the correct
             operating system that supports this.
         -->
-        <github.repository>octodemo-containers/bookstore-advanced</github.repository>
+        <github.repository>octodemo-containers/bookstore-advanced-beta</github.repository>
         <!-- The container registry to publish to -->
         <container.image.registry>ghcr.io</container.image.registry>
         <container.image.name>octodemo-containers/${project.artifactId}</container.image.name>
@@ -344,7 +344,7 @@
                                                     <!-- <org.opencontainer.image.created></org.opencontainer.image.created> -->
                                                     <org.opencontainers.image.authors>GitHub Solutions Engineering</org.opencontainers.image.authors>
                                                     <org.opencontainers.image.url>${project.url}</org.opencontainers.image.url>
-                                                    <org.opencontainers.image.documentation>https://github.com/octodemo-containers/bookstore-advanced/README.md</org.opencontainers.image.documentation>
+                                                    <org.opencontainers.image.documentation>https://github.com/octodemo-containers/bookstore-advanced-beta/README.md</org.opencontainers.image.documentation>
                                                     <org.opencontainers.image.source>${project.url}</org.opencontainers.image.source>
                                                     <org.opencontainers.image.version>${project.version}</org.opencontainers.image.version>
                                                     <org.opencontainers.image.revision>${changelist}</org.opencontainers.image.revision>

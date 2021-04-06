@@ -217,8 +217,8 @@
         "cwd": "${workspaceFolder}/terraform/kubernetes",
         "env": {
           "TF_VAR_ENVIRONMENT": "vscode-test",
-          "TF_VAR_app_container": "bookstore-advanced",
-          "TF_VAR_database_container": "bookstore-advanced-database"
+          "TF_VAR_app_container": "bookstore-advanced-beta",
+          "TF_VAR_database_container": "bookstore-advanced-beta-database"
         }
       },
       "group": "none",
@@ -243,9 +243,9 @@
         "cwd": "${workspaceFolder}/terraform/kubernetes",
         "env": {
           "TF_VAR_ENVIRONMENT": "vscode-test",
-          "TF_VAR_app_container": "bookstore-advanced",
+          "TF_VAR_app_container": "bookstore-advanced-beta",
           "TF_VAR_app_container_version": "placeholder",
-          "TF_VAR_database_container": "bookstore-advanced-database",
+          "TF_VAR_database_container": "bookstore-advanced-beta-database",
           "TF_VAR_database_container_version": "placeholder"
         }
       },
@@ -386,7 +386,7 @@
     {
       "id": "container_name",
       "type": "promptString",
-      "default": "bookstore-advanced",
+      "default": "bookstore-advanced-beta",
       "description": "The container image name",
     },
     {
