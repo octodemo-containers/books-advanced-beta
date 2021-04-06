@@ -35,6 +35,13 @@ jobs:
             const scriptPath = require('path').resolve('./.github/workflows/scripts/create_deployment.js');
             const utils = require(scriptPath);
 
+            // Put eyes on the comment
+            await github.reactions.createForIssueComment({
+                ...context.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
+
             const request = context.payload.comment.body;
             const ALLOWED_ENVIRONMENTS = ['qa', 'test'];
 
