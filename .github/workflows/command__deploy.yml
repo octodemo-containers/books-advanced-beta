@@ -49,7 +49,7 @@ jobs:
               const parts = utils.validateEnvironment(request);
 
               // Ensure request is one of the allowed options
-              if (parts && ALLOWED_ENVIRONMENTS.indexOf(parts.name]) > -1) {
+              if (parts && ALLOWED_ENVIRONMENTS.indexOf(parts.name) > -1) {
                 core.info(`deploy request for environment "${parts.name} in ${parts.cloud}"`);
 
                 await github.issues.addLabels({
