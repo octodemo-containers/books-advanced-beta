@@ -45,7 +45,7 @@ jobs:
                 content: 'eyes'
               });
 
-            const request = context.payload.comment.body;
+            const request = context.payload.comment.body.trim();
             const ALLOWED_ENVIRONMENTS = ['qa', 'test'];
 
             try {
@@ -61,7 +61,7 @@ jobs:
                   labels: [`deploy to ${parts.cloud} ${parts.name}`]
                 });
               } else {
-                core.setFailure(`Unsupported environment for deploy slash command; ${parts.name}`);
+                core.setFailed(`Unsupported environment for deploy slash command; ${parts.name}`);
 
                 await github.issues.createComment({
                   ...context.repo,
@@ -71,8 +71,8 @@ jobs:
               }
             } catch (err) {
               core.error(err);
+              core.setFailed(`Error processing request; ${request}`);
 
-              core.setFailure(`Error processing request; ${request}`);
               await github.issues.createComment({
                   ...context.repo,
                   issue_number: context.issue.number,
