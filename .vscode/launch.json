@@ -9,7 +9,8 @@
       "hostName": "localhost",
       "port": 5005,
       "preLaunchTask": "jettyStart",
-      "postDebugTask": "jettyStop"
+      "postDebugTask": "jettyStop",
+      "timeout": 30000,
     }
   ]
 }
