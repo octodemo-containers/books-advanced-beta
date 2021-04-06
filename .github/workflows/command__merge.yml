@@ -1,0 +1,91 @@
+name: Command - merge
+
+#
+# An IssueOps Command. This command provides a "/merge" command that can be used from Issue comments
+# This is very similar to a Slack Slash command in intent.
+#
+
+on:
+  issue_comment:
+    types:
+      - created
+      - edited
+
+jobs:
+  command:
+    name: Command
+
+    runs-on: ubuntu-20.04
+
+    # Save some actions minutes and only execute if we meet the necessary conditions.
+    # This is only a valid request if we are on a pull request, gate for that by checking the pull_request information in the payload
+    if: startsWith(github.event.comment.body, '/merge') && github.event.issue.pull_request != null
+
+    steps:
+      - name: Get temporary token
+        id: temp_token
+        uses: peter-murray/workflow-application-token-action@v1
+        with:
+          application_id: ${{ secrets.OCTODEMOBOT_APPLICATION_ID_REPO_AUTOMATION }}
+          application_private_key: ${{ secrets.OCTODEMOBOT_APPLICATION_KEY_REPO_AUTOMATION }}
+
+      - name: Parse and Respond to Command
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ steps.temp_token.outputs.token }}
+          script: |
+            const comment = context.payload.comment.body;
+            const request = /^\/merge/.exec(comment);
+
+            // Ensure request is valid
+            if (request) {
+              // Acknowledge we have seen the comment using the eyes reaction on the comment
+              await github.reactions.createForIssueComment({
+                ...context.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
+
+              const user = context.payload.comment.user.login;
+
+              // We only accept members of the specified team as having the necessary privileges to run this command.
+              const teamName = 'project-leads';
+              console.log(`Checking @${user} membership in project-leads team`);
+
+              // A comment body to report back to the user if required
+              let commentBody = null;
+              try {
+                const isMember = await github.teams.getMembershipForUserInOrg({
+                  org: context.payload.organization.login,
+                  team_slug: teamName,
+                  username: user,
+                });
+                console.log(`User is a member of the required team ${teamName}`);
+                try {
+                  await github.pulls.merge({
+                    ...context.repo,
+                    pull_number: context.payload.issue.number
+                  });
+                } catch (err) {
+                  commentBody = `Well this is embarassing... Something went wrong performing merge:
+                    __${err.message}__
+                  `;
+                }
+              } catch (err) {
+                console.log(err.status);
+                if (err.status === 404) {
+                  commentBody = `:red_circle:  User @${user} is not privileged to run the command! Only members of __${teamName}__ can perform this operation.`;
+                } else {
+                  commentBody = `:red_circle:  Unexpected error encountered when running command! Status: ${err.status} error: ${JSON.stringify(err.data)}`;
+                }
+              }
+
+              // Report back via a comment to the issue if we have something to relay to the issue/user
+              if (commentBody) {
+                await github.issues.createComment({
+                    ...context.repo,
+                    issue_number: context.issue.number,
+                    body: commentBody,
+                });
+              }
+            }
