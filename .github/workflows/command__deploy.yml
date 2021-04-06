@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     # Save some actions minutes, and only execute when necessary :-)
-    if: startsWith(github.event.comment.body, '/deploy to ')
+    if: startsWith(github.event.comment.body, '/deploy ')
 
     steps:
       - name: Get temporary token

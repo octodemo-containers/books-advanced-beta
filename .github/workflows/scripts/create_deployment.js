@@ -4,7 +4,7 @@
 
 
 module.exports.validateEnvironment = function(command) {
-  const commandRegex = /^deploy to (aws|azure|gcp) ([a-zA-Z-_]+)/i;
+  const commandRegex = /^deploy (to |)(aws|azure|gcp) ([a-zA-Z-_]+)/i;
 
   const matched = commandRegex.exec(command);
   if (!matched) {
