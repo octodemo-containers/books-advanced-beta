@@ -1,3 +1,5 @@
+[![Board Status](https://dev.azure.com/octodemo-containers/7853e309-eaf4-4a4b-8b3f-f2a41741656e/c285dceb-2a09-4c12-941f-2fadd85b5876/_apis/work/boardbadge/09ce193f-f7a5-476b-9897-8dd793e004be?columnOptions=1)](https://dev.azure.com/octodemo-containers/7853e309-eaf4-4a4b-8b3f-f2a41741656e/_boards/board/t/c285dceb-2a09-4c12-941f-2fadd85b5876/Microsoft.RequirementCategory/)
+
 # GitHub Container Demo Bookstore
 
 A Java based Servlet implementation of a bookstore.
